@@ -1,0 +1,50 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "py-healthchecks.fullname" . }}
+  labels:
+    app: {{ template "py-healthchecks.name" . }}
+    chart: {{ template "py-healthchecks.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "py-healthchecks.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "py-healthchecks.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: TARGET
+            value: "{{ .Values.target }}"
+          - name: PROXY
+            value: "{{ .Values.proxy }}"
+          - name: INTERVAL_SECONDS
+            value: "{{ .Values.interval_seconds }}"
+          - name: ROLLBAR_ENVIRONMENT
+            value: "{{ .Values.rollbar_environment }}"
+          - name: ROLLBAR_ACCESS_TOKEN
+            value: "{{ .Values.rollbar_token }}"
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
