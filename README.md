@@ -7,4 +7,4 @@ helm repo update
 helm install py-healthchecks/py-healthchecks --name py-healthchecks --namespace=py-healthchecks -f path_to_env_vars
 ```
 ### Contribution
-See [.ops/](.ops/)
+See [./ops](./ops)
